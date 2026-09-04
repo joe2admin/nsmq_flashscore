@@ -5,6 +5,7 @@ import '../../../../app/theme/app_shadows.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/widgets/neo_badge.dart';
 import '../../../../core/widgets/neo_folder_card.dart';
+import '../../../../core/widgets/school_badge_avatar.dart';
 import '../../domain/entities/contest.dart';
 
 /// Flashscore-style Match Card tailored for 3-School NSMQ Contests.
@@ -56,41 +57,6 @@ class NsmqMatchCard extends StatelessWidget {
                 child: Divider(color: NeoColors.border, thickness: 1.5),
               ),
           ],
-
-          const SizedBox(height: 12),
-
-          // Bottom Round Ticker / Stage Progress Footer (Overflow-proof)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: NeoColors.surfaceMuted,
-              borderRadius: NeoBorders.radiusSm,
-              border: Border.all(color: NeoColors.border, width: NeoBorders.strokeThin),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.timer_outlined, size: 14, color: NeoColors.textSecondary),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    contest.status == ContestStatus.live
-                        ? contest.currentRoundName.toUpperCase()
-                        : contest.status == ContestStatus.finished
-                            ? 'CONTEST CONCLUDED'
-                            : 'STARTS AT 14:30 GMT',
-                    style: NeoTypography.badge(color: NeoColors.textSecondary),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'DETAILS →',
-                  style: NeoTypography.badge(color: NeoColors.nsmqRed),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -119,30 +85,38 @@ class NsmqMatchCard extends StatelessWidget {
 
     return Row(
       children: [
-        // School Icon / Leader Trophy Circle (Fixed 26x26)
-        Container(
-          width: 26,
-          height: 26,
-          decoration: BoxDecoration(
-            color: isLeader ? NeoColors.gold : NeoColors.surfaceMuted,
-            shape: BoxShape.circle,
-            border: Border.all(color: NeoColors.border, width: 1.5),
-          ),
-          child: Center(
-            child: isLeader
-                ? const Icon(Icons.emoji_events, size: 14, color: NeoColors.textPrimary)
-                : Text(
-                    entry.school.shortName.isNotEmpty
-                        ? entry.school.shortName.substring(0, 1)
-                        : entry.school.name.substring(0, 1),
-                    style: NeoTypography.badge(color: NeoColors.textPrimary).copyWith(fontSize: 10),
+        // School Crest Badge Avatar (Fixed 28x28 with leader overlay)
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            SchoolBadgeAvatar(
+              crestUrl: entry.school.crestUrl,
+              schoolId: entry.school.id,
+              schoolName: entry.school.shortName.isNotEmpty
+                  ? entry.school.shortName
+                  : entry.school.name,
+              size: 28,
+              isLeader: isLeader,
+            ),
+            if (isLeader)
+              Positioned(
+                right: -3,
+                top: -3,
+                child: Container(
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: const BoxDecoration(
+                    color: NeoColors.gold,
+                    shape: BoxShape.circle,
                   ),
-          ),
+                  child: const Icon(Icons.emoji_events, size: 9, color: NeoColors.textPrimary),
+                ),
+              ),
+          ],
         ),
 
         const SizedBox(width: 8),
 
-        // School Name & Region/Trophies (Takes remaining available width with ellipsis)
+        // School Name & Region (Takes remaining available width with ellipsis)
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,9 +130,7 @@ class NsmqMatchCard extends StatelessWidget {
               ),
               const SizedBox(height: 1),
               Text(
-                entry.school.titlesCount > 0
-                    ? '${entry.school.region} • ${entry.school.titlesCount}x 🏆'
-                    : entry.school.region,
+                entry.school.region,
                 style: NeoTypography.caption(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

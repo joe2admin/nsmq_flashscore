@@ -28,10 +28,15 @@ class NeoBorders {
         right: right > 0 ? BorderSide(color: color, width: right) : BorderSide.none,
       );
 
+  // Radius values
+  static const double sm = 8.0;
+  static const double md = 12.0;
+  static const double lg = 16.0;
+
   // Corner Radii
-  static const BorderRadius radiusSm = BorderRadius.all(Radius.circular(8.0));
-  static const BorderRadius radiusMd = BorderRadius.all(Radius.circular(12.0));
-  static const BorderRadius radiusLg = BorderRadius.all(Radius.circular(16.0));
+  static const BorderRadius radiusSm = BorderRadius.all(Radius.circular(sm));
+  static const BorderRadius radiusMd = BorderRadius.all(Radius.circular(md));
+  static const BorderRadius radiusLg = BorderRadius.all(Radius.circular(lg));
   static const BorderRadius radiusPill = BorderRadius.all(Radius.circular(999.0));
 
   // Top-only & Bottom-only Radii (For Folder Tabs)

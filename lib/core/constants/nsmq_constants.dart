@@ -4,12 +4,16 @@ class NsmqConstants {
 
   static const String appName = 'NSMQ FLASHSCORE';
 
-  // Round Names
-  static const String round1Name = 'Round 1: Fundamentals';
-  static const String round2Name = 'Round 2: The Speed Race';
-  static const String round3Name = 'Round 3: Problem of the Day';
-  static const String round4Name = 'Round 4: True or False';
-  static const String round5Name = 'Round 5: Riddles';
+  // Round Names (Official NSMQ 2026 Sponsorships)
+  static const String round1Name = 'Round 1: General Questions';
+  static const String round2Name = 'Round 2: Trustur AI Speed Race';
+  static const String round3Name = 'Round 3: Prudential Life NSMQ Star (Problem of the Day)';
+  static const String round4Name = 'Round 4: Jupay True/False';
+  static const String round5Name = 'Round 5: GOIL Super Bonanza (Riddles)';
+
+  // Venues
+  static const String venueQuarterSemiFinals = 'Main Auditorium, UCC, Cape Coast';
+  static const String venueGrandFinale = 'UG Premier Domes, University of Ghana, Legon';
 
   // Scoring Rules
   static const int r1DirectPoints = 3;
@@ -23,6 +27,12 @@ class NsmqConstants {
   static const int r5Clue2Points = 4;
   static const int r5Clue3Points = 3;
 
+  // Official Awards & Prize Values
+  static const String prudentialNsmqStarPrize = 'GH¢3,400';
+  static const String jupayCleanSheetPrize = 'GH¢1,500';
+  static const String pepsodentHighestScorerPrize = 'GH¢3,000';
+  static const String goilSuperBonanzaRiddlePrize = 'GH¢600 per riddle';
+
   // Stages
   static const List<String> stages = [
     'Regional Qualifiers',
@@ -32,4 +42,8 @@ class NsmqConstants {
     'Semi-Finals',
     'Grand Finale',
   ];
+
+  // Live Audio Broadcast
+  static const String defaultLiveAudioStream = 'https://stream.zeno.fm/t3q5zg84n7zuv';
+  static const String defaultAudioStationName = 'JOY 99.7 FM • NSMQ LIVE FEED';
 }

@@ -30,6 +30,7 @@ class Contest {
   final int currentRound;     // 1 to 5 (or 0 if scheduled)
   final String currentRoundName; // e.g. "Round 3: Problem of the Day"
   final List<ContestantEntry> entries; // Typically 3 schools
+  final String? liveAudioUrl; // Live radio / commentary audio stream URL
 
   const Contest({
     required this.id,
@@ -40,7 +41,28 @@ class Contest {
     this.currentRound = 0,
     this.currentRoundName = '',
     required this.entries,
+    this.liveAudioUrl,
   });
+
+  /// Highest total points among contestants in this contest
+  int get highestScore {
+    if (entries.isEmpty) return 0;
+    return entries.map((e) => e.scores.total).reduce((a, b) => a > b ? a : b);
+  }
+
+  /// Finds the school(s) currently leading with the highest score
+  List<ContestantEntry> get leaders {
+    if (entries.isEmpty) return [];
+    final max = highestScore;
+    return entries.where((e) => e.scores.total == max).toList();
+  }
+
+  /// Checks if a school is currently leading (or tied for the lead)
+  bool isSchoolLeader(String schoolId) {
+    if (entries.isEmpty) return false;
+    final max = highestScore;
+    return entries.any((e) => e.school.id == schoolId && e.scores.total == max);
+  }
 
   /// Finds the school currently leading in total points
   ContestantEntry? get leader {
