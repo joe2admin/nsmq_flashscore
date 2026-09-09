@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:nsmq_flashscore/core/widgets/neo_skeleton.dart';
 import 'package:nsmq_flashscore/features/contest_detail/presentation/widgets/contest_detail_skeleton.dart';
 import 'package:nsmq_flashscore/features/favorites/presentation/widgets/favorites_skeleton.dart';

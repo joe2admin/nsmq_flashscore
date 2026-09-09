@@ -11,6 +11,7 @@ import '../../../../core/widgets/school_badge_avatar.dart';
 import 'package:nsmq_flashscore/features/live_scores/presentation/widgets/nsmq_match_card.dart';
 import '../controllers/favorites_controller.dart';
 import '../widgets/favorites_skeleton.dart';
+import 'package:nsmq_flashscore/features/shell/presentation/controllers/navigation_controller.dart';
 
 class FavoritesView extends GetView<FavoritesController> {
   const FavoritesView({super.key});
@@ -35,8 +36,10 @@ class FavoritesView extends GetView<FavoritesController> {
             message: 'Star schools from the Schools Directory to receive live updates, buzzer alerts, and score tracking.',
             actionText: 'Explore Schools',
             onAction: () {
-              // Switch to Schools Tab
-              Get.until((route) => route.isFirst);
+              // Switch to Schools Directory tab
+              if (Get.isRegistered<NavigationController>()) {
+                Get.find<NavigationController>().changePage(2);
+              }
             },
           );
         }

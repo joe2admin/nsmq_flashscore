@@ -119,7 +119,11 @@ class SchoolsRepositoryImpl implements ISchoolsRepository {
       if (response.isOk && response.body != null) {
         final body = response.body;
         final dynamic dataRaw = body is Map ? body['data'] : body;
-        if (dataRaw is List) {
+        if (dataRaw is Map && dataRaw['schools'] is List) {
+          return (dataRaw['schools'] as List)
+              .map((item) => SchoolProfileModel.fromJson(item as Map<String, dynamic>))
+              .toList();
+        } else if (dataRaw is List) {
           return dataRaw
               .map((item) => SchoolProfileModel.fromJson(item as Map<String, dynamic>))
               .toList();

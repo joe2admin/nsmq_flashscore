@@ -10,4 +10,5 @@ abstract class AppRoutes {
   static const news = '/news';
   static const newsDetail = '/news-detail';
   static const favorites = '/favorites';
+  static const aboutNsmq = '/about-nsmq';
 }

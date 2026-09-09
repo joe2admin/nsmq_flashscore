@@ -8,6 +8,7 @@ import 'package:nsmq_flashscore/features/live_scores/domain/repositories/i_conte
 import 'package:nsmq_flashscore/features/schools/data/models/school_profile_model.dart';
 import 'package:nsmq_flashscore/features/schools/domain/entities/school_profile.dart';
 import 'package:nsmq_flashscore/features/schools/domain/repositories/i_schools_repository.dart';
+import 'package:nsmq_flashscore/features/schools/presentation/controllers/schools_controller.dart';
 
 class FavoritesController extends GetxController {
   final ISchoolsRepository schoolsRepository;
@@ -115,7 +116,30 @@ class FavoritesController extends GetxController {
   }
 
   Future<void> removeFavorite(String schoolId) async {
+    favoriteSchools.removeWhere((s) => s.school.id == schoolId);
+
+    // Sync state back to SchoolsController if registered
+    if (Get.isRegistered<SchoolsController>()) {
+      Get.find<SchoolsController>().updateSchoolFavorite(schoolId, false);
+    }
+
     await schoolsRepository.toggleFavorite(schoolId);
-    loadFavorites();
+    loadFavorites(showLoading: false);
+  }
+
+  /// Synchronize when a school is favorited or unfavorited elsewhere (Directory, School Profile)
+  void onSchoolFavoriteToggled(SchoolProfile profile) {
+    if (profile.isFavorite) {
+      final existingIndex = favoriteSchools.indexWhere((s) => s.school.id == profile.school.id);
+      if (existingIndex != -1) {
+        favoriteSchools[existingIndex] = profile;
+      } else {
+        favoriteSchools.insert(0, profile);
+      }
+    } else {
+      favoriteSchools.removeWhere((s) => s.school.id == profile.school.id);
+    }
+    // Refresh matching contests in background without loading skeleton
+    loadFavorites(showLoading: false);
   }
 }

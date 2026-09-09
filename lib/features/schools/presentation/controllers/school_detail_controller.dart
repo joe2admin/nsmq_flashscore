@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
+import 'package:nsmq_flashscore/features/favorites/presentation/controllers/favorites_controller.dart';
 import 'package:nsmq_flashscore/features/live_scores/domain/entities/contest.dart';
 import 'package:nsmq_flashscore/features/live_scores/domain/entities/school.dart';
+import 'package:nsmq_flashscore/features/schools/presentation/controllers/schools_controller.dart';
 import '../../domain/entities/school_profile.dart';
 import '../../domain/repositories/i_schools_repository.dart';
 
@@ -63,7 +65,30 @@ class SchoolDetailController extends GetxController {
   Future<void> toggleFavorite() async {
     final current = profile.value;
     if (current == null) return;
-    await repository.toggleFavorite(current.school.id);
-    profile.value = current.copyWith(isFavorite: !current.isFavorite);
+    final updated = current.copyWith(isFavorite: !current.isFavorite);
+    profile.value = updated;
+
+    // Sync with SchoolsController
+    if (Get.isRegistered<SchoolsController>()) {
+      Get.find<SchoolsController>().updateSchoolFavorite(current.school.id, updated.isFavorite);
+    }
+
+    // Sync with FavoritesController
+    if (Get.isRegistered<FavoritesController>()) {
+      Get.find<FavoritesController>().onSchoolFavoriteToggled(updated);
+    }
+
+    try {
+      await repository.toggleFavorite(current.school.id);
+    } catch (e) {
+      profile.value = current;
+      if (Get.isRegistered<SchoolsController>()) {
+        Get.find<SchoolsController>().updateSchoolFavorite(current.school.id, current.isFavorite);
+      }
+      if (Get.isRegistered<FavoritesController>()) {
+        Get.find<FavoritesController>().onSchoolFavoriteToggled(current);
+      }
+    }
   }
 }
+

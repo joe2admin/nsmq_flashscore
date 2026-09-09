@@ -122,7 +122,7 @@ class TournamentView extends GetView<TournamentController> {
 
           // NSMQ History & Mistresses Archive Button
           GestureDetector(
-            onTap: () => NsmqHistorySheet.show(context),
+            onTap: () => Get.toNamed(AppRoutes.aboutNsmq),
             child: Container(
               width: 36,
               height: 36,
@@ -370,7 +370,7 @@ class TournamentView extends GetView<TournamentController> {
 
                   // View past winners action
                   GestureDetector(
-                    onTap: () => NsmqHistorySheet.show(context),
+                    onTap: () => Get.toNamed(AppRoutes.aboutNsmq),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
