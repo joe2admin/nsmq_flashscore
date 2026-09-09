@@ -10,6 +10,7 @@ import '../../domain/entities/tournament_stage.dart';
 import '../controllers/tournament_controller.dart';
 import '../widgets/stage_bracket_card.dart';
 import '../widgets/tournament_bracket_connectors.dart';
+import '../widgets/tournament_skeleton.dart';
 import '../widgets/trophy_champion_widget.dart';
 import '../widgets/nsmq_history_sheet.dart';
 
@@ -23,9 +24,7 @@ class TournamentView extends GetView<TournamentController> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(
-              child: CircularProgressIndicator(color: NeoColors.nsmqRed),
-            );
+            return const TournamentSkeleton();
           }
 
           final stages = controller.stages;

@@ -10,6 +10,7 @@ import '../../../../core/widgets/neo_empty_state.dart';
 import '../../../../core/widgets/school_badge_avatar.dart';
 import 'package:nsmq_flashscore/features/live_scores/presentation/widgets/nsmq_match_card.dart';
 import '../controllers/favorites_controller.dart';
+import '../widgets/favorites_skeleton.dart';
 
 class FavoritesView extends GetView<FavoritesController> {
   const FavoritesView({super.key});
@@ -24,9 +25,7 @@ class FavoritesView extends GetView<FavoritesController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: NeoColors.nsmqRed),
-          );
+          return const FavoritesSkeleton();
         }
 
         if (controller.favoriteSchools.isEmpty) {

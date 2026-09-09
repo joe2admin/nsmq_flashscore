@@ -12,6 +12,7 @@ import 'package:nsmq_flashscore/features/news/presentation/widgets/comments_shee
 import 'package:nsmq_flashscore/features/news/presentation/widgets/compose_post_sheet.dart';
 import 'package:nsmq_flashscore/features/news/presentation/widgets/feed_post_card.dart';
 import 'package:nsmq_flashscore/features/news/presentation/widgets/news_card.dart';
+import 'package:nsmq_flashscore/features/news/presentation/widgets/news_feed_skeleton.dart';
 
 class NewsFeedView extends GetView<NewsController> {
   const NewsFeedView({super.key});
@@ -65,8 +66,8 @@ class NewsFeedView extends GetView<NewsController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(
-                  child: CircularProgressIndicator(color: NeoColors.nsmqRed),
+                return NewsFeedSkeleton(
+                  isArticles: controller.selectedCategory.value == 'ARTICLES',
                 );
               }
 

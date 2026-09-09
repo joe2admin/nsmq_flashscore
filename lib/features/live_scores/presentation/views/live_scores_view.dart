@@ -8,6 +8,7 @@ import '../../../../core/widgets/neo_search_bar.dart';
 import '../controllers/live_scores_controller.dart';
 import '../widgets/date_strip_selector.dart';
 import '../widgets/filter_chips_row.dart';
+import '../widgets/match_list_skeleton.dart';
 import '../widgets/nsmq_match_card.dart';
 
 class LiveScoresView extends GetView<LiveScoresController> {
@@ -47,12 +48,7 @@ class LiveScoresView extends GetView<LiveScoresController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    color: NeoColors.nsmqRed,
-                    strokeWidth: 3,
-                  ),
-                );
+                return const MatchListSkeleton();
               }
 
               if (controller.contests.isEmpty) {

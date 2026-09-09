@@ -7,6 +7,7 @@ import '../../../../app/theme/app_typography.dart';
 import '../../../../core/widgets/neo_app_bar.dart';
 import 'package:nsmq_flashscore/features/live_scores/domain/entities/contest.dart';
 import '../controllers/contest_detail_controller.dart';
+import '../widgets/contest_detail_skeleton.dart';
 import '../widgets/contest_header_card.dart';
 import '../widgets/contest_live_audio_card.dart';
 import '../widgets/contestants_card.dart';
@@ -52,9 +53,7 @@ class ContestDetailView extends GetView<ContestDetailController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: NeoColors.nsmqRed),
-          );
+          return const ContestDetailSkeleton();
         }
 
         final detail = controller.contestDetail.value;

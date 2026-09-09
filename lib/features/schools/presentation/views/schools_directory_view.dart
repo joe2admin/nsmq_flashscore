@@ -10,6 +10,7 @@ import '../../../../core/widgets/neo_empty_state.dart';
 import '../../../../core/widgets/neo_search_bar.dart';
 import '../controllers/schools_controller.dart';
 import '../widgets/school_tile_card.dart';
+import '../widgets/schools_directory_skeleton.dart';
 
 class SchoolsDirectoryView extends GetView<SchoolsController> {
   const SchoolsDirectoryView({super.key});
@@ -105,9 +106,7 @@ class SchoolsDirectoryView extends GetView<SchoolsController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(
-                  child: CircularProgressIndicator(color: NeoColors.nsmqRed),
-                );
+                return const SchoolsDirectorySkeleton();
               }
 
               if (controller.schools.isEmpty) {

@@ -9,6 +9,7 @@ import '../../../../core/widgets/neo_app_bar.dart';
 import '../../../../core/widgets/school_badge_avatar.dart';
 import 'package:nsmq_flashscore/features/live_scores/presentation/widgets/nsmq_match_card.dart';
 import '../controllers/school_detail_controller.dart';
+import '../widgets/school_detail_skeleton.dart';
 
 class SchoolDetailView extends GetView<SchoolDetailController> {
   const SchoolDetailView({super.key});
@@ -46,9 +47,7 @@ class SchoolDetailView extends GetView<SchoolDetailController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: NeoColors.nsmqRed),
-          );
+          return const SchoolDetailSkeleton();
         }
 
         final profile = controller.profile.value;
