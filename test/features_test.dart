@@ -69,6 +69,18 @@ void main() {
         expect(s.school.titlesCount > 0, isTrue);
       }
     });
+
+    test('SchoolsRepositoryImpl retrieves school contest match history', () async {
+      final repo = SchoolsRepositoryImpl();
+      final history = await repo.getSchoolHistory('sch_presec');
+      expect(history.isNotEmpty, isTrue);
+      for (final contest in history) {
+        final hasPresec = contest.entries.any((e) =>
+            e.school.name.contains('Presbyterian') ||
+            e.school.shortName.contains('PRESEC'));
+        expect(hasPresec, isTrue);
+      }
+    });
   });
 
   group('Tournament Repository', () {

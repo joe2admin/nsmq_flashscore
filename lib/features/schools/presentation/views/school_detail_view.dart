@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../app/routes/app_routes.dart';
 import '../../../../app/theme/app_borders.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_shadows.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/widgets/neo_app_bar.dart';
 import '../../../../core/widgets/school_badge_avatar.dart';
+import 'package:nsmq_flashscore/features/live_scores/presentation/widgets/nsmq_match_card.dart';
 import '../controllers/school_detail_controller.dart';
 
 class SchoolDetailView extends GetView<SchoolDetailController> {
@@ -287,6 +289,43 @@ class SchoolDetailView extends GetView<SchoolDetailController> {
                 ],
               ),
             ),
+
+            // Contest Match History
+            Obx(() {
+              if (controller.matchHistory.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const Icon(Icons.history, color: NeoColors.nsmqRed, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'CONTEST HISTORY (${controller.matchHistory.length})',
+                          style: NeoTypography.headingMedium(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ...controller.matchHistory.map((contest) {
+                    return NsmqMatchCard(
+                      contest: contest,
+                      onTap: () {
+                        Get.toNamed(AppRoutes.contestDetail, arguments: contest);
+                      },
+                    );
+                  }),
+                ],
+              );
+            }),
           ],
         );
       }),

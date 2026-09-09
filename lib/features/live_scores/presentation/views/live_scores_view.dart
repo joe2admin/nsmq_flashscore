@@ -71,7 +71,7 @@ class LiveScoresView extends GetView<LiveScoresController> {
 
               return RefreshIndicator(
                 color: NeoColors.nsmqRed,
-                onRefresh: controller.fetchContests,
+                onRefresh: controller.refreshContests,
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   itemCount: controller.contests.length,

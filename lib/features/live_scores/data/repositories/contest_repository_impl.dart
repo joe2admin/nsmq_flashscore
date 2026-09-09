@@ -1,9 +1,18 @@
+import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/network/api_client.dart';
 import '../../domain/entities/contest.dart';
 import '../../domain/repositories/i_contest_repository.dart';
+import '../models/contest_model.dart';
 import '../providers/mock_contest_data.dart';
 
 class ContestRepositoryImpl implements IContestRepository {
-  final List<Contest> _contests = MockContestData.getContests();
+  final ApiClient _apiClient;
+  final List<Contest> _mockContests = MockContestData.getContests();
+
+  ContestRepositoryImpl({ApiClient? apiClient})
+      : _apiClient = apiClient ?? (Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : ApiClient());
 
   @override
   Future<List<Contest>> getContests({
@@ -12,11 +21,42 @@ class ContestRepositoryImpl implements IContestRepository {
     String? stage,
     String? searchQuery,
   }) async {
-    // Simulated micro-network latency for realistic async behavior
-    await Future.delayed(const Duration(milliseconds: 150));
+    try {
+      final queryParams = <String, dynamic>{};
+      if (status != null) {
+        queryParams['status'] = status.name;
+      }
+      if (date != null) {
+        queryParams['date'] =
+            '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      }
+      if (stage != null && stage != 'All Stages') {
+        queryParams['stage'] = stage;
+      }
+      if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+        queryParams['search'] = searchQuery.trim();
+      }
 
-    return _contests.where((c) {
-      // Date filter
+      final response = await _apiClient.safeGet(ApiEndpoints.contests, query: queryParams);
+
+      if (response.isOk && response.body != null) {
+        final body = response.body;
+        final dynamic dataRaw = body is Map ? body['data'] : body;
+
+        if (dataRaw is List) {
+          final liveList = dataRaw
+              .map((item) => ContestModel.fromJson(item as Map<String, dynamic>))
+              .toList();
+
+          return liveList;
+        }
+      }
+    } catch (e) {
+      debugPrint('[ContestRepositoryImpl] Backend error, falling back to mock: $e');
+    }
+
+    // Fallback to local mock data
+    return _mockContests.where((c) {
       if (date != null) {
         final sameDay = c.scheduledAt.year == date.year &&
             c.scheduledAt.month == date.month &&
@@ -24,17 +64,14 @@ class ContestRepositoryImpl implements IContestRepository {
         if (!sameDay) return false;
       }
 
-      // Status filter
       if (status != null && c.status != status) {
         return false;
       }
 
-      // Stage filter
       if (stage != null && stage != 'All Stages' && c.stage != stage) {
         return false;
       }
 
-      // Search query filter
       if (searchQuery != null && searchQuery.trim().isNotEmpty) {
         final query = searchQuery.trim().toLowerCase();
         final matchesTitle = c.title.toLowerCase().contains(query);
@@ -51,9 +88,24 @@ class ContestRepositoryImpl implements IContestRepository {
 
   @override
   Future<Contest?> getContestById(String id) async {
-    await Future.delayed(const Duration(milliseconds: 100));
     try {
-      return _contests.firstWhere((c) => c.id == id);
+      final response = await _apiClient.safeGet(ApiEndpoints.contestDetail(id));
+      if (response.isOk && response.body != null) {
+        final body = response.body;
+        final dynamic dataRaw = body is Map ? body['data'] : body;
+        if (dataRaw is Map<String, dynamic>) {
+          final contestData = dataRaw['contest'] is Map<String, dynamic>
+              ? dataRaw['contest'] as Map<String, dynamic>
+              : dataRaw;
+          return ContestModel.fromJson(contestData);
+        }
+      }
+    } catch (e) {
+      debugPrint('[ContestRepositoryImpl] getContestById backend error: $e');
+    }
+
+    try {
+      return _mockContests.firstWhere((c) => c.id == id);
     } catch (_) {
       return null;
     }

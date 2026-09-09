@@ -42,9 +42,12 @@ class FavoritesView extends GetView<FavoritesController> {
           );
         }
 
-        return ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          children: [
+        return RefreshIndicator(
+          color: NeoColors.nsmqRed,
+          onRefresh: controller.refreshFavorites,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            children: [
             // Pinned Schools Header
             Row(
               children: [
@@ -150,18 +153,21 @@ class FavoritesView extends GetView<FavoritesController> {
                           title: 'Live Round Score Updates',
                           subtitle: 'Alert immediately when a round concludes',
                           value: controller.alertLiveRounds,
+                          onChanged: (v) => controller.updatePreference(liveRounds: v),
                         ),
                         const Divider(height: 12, color: NeoColors.neutralMuted),
                         _buildSwitchTile(
                           title: 'Problem of the Day Released',
                           subtitle: 'Receive notification when Round 3 questions drop',
                           value: controller.alertProblemOfDay,
+                          onChanged: (v) => controller.updatePreference(problemOfDay: v),
                         ),
                         const Divider(height: 12, color: NeoColors.neutralMuted),
                         _buildSwitchTile(
                           title: 'Final Match Verdict',
                           subtitle: 'Immediate broadcast of winning school & scores',
                           value: controller.alertFinalScores,
+                          onChanged: (v) => controller.updatePreference(finalScores: v),
                         ),
                       ],
                     ),
@@ -215,35 +221,40 @@ class FavoritesView extends GetView<FavoritesController> {
                 );
               }),
           ],
-        );
-      }),
-    );
-  }
-
-  Widget _buildSwitchTile({
-    required String title,
-    required String subtitle,
-    required RxBool value,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: NeoTypography.bodyBold(size: 13)),
-              Text(subtitle, style: NeoTypography.caption(color: NeoColors.textSecondary)),
-            ],
-          ),
         ),
-        Obx(() => Switch(
-              value: value.value,
-              onChanged: (v) => value.value = v,
-              activeThumbColor: NeoColors.nsmqRed,
-              activeTrackColor: NeoColors.surfaceRed,
-            )),
-      ],
-    );
-  }
+      );
+    }),
+  );
+}
+
+Widget _buildSwitchTile({
+  required String title,
+  required String subtitle,
+  required RxBool value,
+  ValueChanged<bool>? onChanged,
+}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: NeoTypography.bodyBold(size: 13)),
+            Text(subtitle, style: NeoTypography.caption(color: NeoColors.textSecondary)),
+          ],
+        ),
+      ),
+      Obx(() => Switch(
+            value: value.value,
+            onChanged: (v) {
+              value.value = v;
+              onChanged?.call(v);
+            },
+            activeThumbColor: NeoColors.nsmqRed,
+            activeTrackColor: NeoColors.surfaceRed,
+          )),
+    ],
+  );
+}
 }

@@ -1,3 +1,4 @@
+import 'package:nsmq_flashscore/features/live_scores/domain/entities/contest.dart';
 import 'package:nsmq_flashscore/features/schools/domain/entities/school_profile.dart';
 
 abstract class ISchoolsRepository {
@@ -10,4 +11,5 @@ abstract class ISchoolsRepository {
   Future<SchoolProfile?> getSchoolById(String id);
   Future<void> toggleFavorite(String id);
   Future<List<SchoolProfile>> getFavoriteSchools();
+  Future<List<Contest>> getSchoolHistory(String id);
 }

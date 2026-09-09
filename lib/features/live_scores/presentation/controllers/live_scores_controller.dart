@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import '../../domain/entities/contest.dart';
 import '../../domain/repositories/i_contest_repository.dart';
@@ -15,14 +16,24 @@ class LiveScoresController extends GetxController {
   final RxList<Contest> contests = <Contest>[].obs;
   final RxBool isLoading = false.obs;
 
+  Timer? _livePollingTimer;
+
   @override
   void onInit() {
     super.onInit();
     fetchContests();
   }
 
-  Future<void> fetchContests() async {
-    isLoading.value = true;
+  @override
+  void onClose() {
+    _stopPolling();
+    super.onClose();
+  }
+
+  Future<void> fetchContests({bool showLoading = true}) async {
+    if (showLoading) {
+      isLoading.value = true;
+    }
     try {
       final results = await repository.getContests(
         date: selectedDate.value,
@@ -31,9 +42,33 @@ class LiveScoresController extends GetxController {
         searchQuery: searchQuery.value,
       );
       contests.assignAll(results);
+      _checkPolling();
     } finally {
-      isLoading.value = false;
+      if (showLoading) {
+        isLoading.value = false;
+      }
     }
+  }
+
+  Future<void> refreshContests() async {
+    await fetchContests(showLoading: false);
+  }
+
+  void _checkPolling() {
+    if (liveCount > 0) {
+      if (_livePollingTimer == null || !_livePollingTimer!.isActive) {
+        _livePollingTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+          fetchContests(showLoading: false);
+        });
+      }
+    } else {
+      _stopPolling();
+    }
+  }
+
+  void _stopPolling() {
+    _livePollingTimer?.cancel();
+    _livePollingTimer = null;
   }
 
   void selectDate(DateTime date) {

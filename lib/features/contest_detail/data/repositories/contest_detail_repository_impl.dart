@@ -1,13 +1,35 @@
+import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/network/api_client.dart';
 import 'package:nsmq_flashscore/features/live_scores/data/providers/mock_contest_data.dart';
 import 'package:nsmq_flashscore/features/live_scores/domain/entities/contest.dart';
-import 'package:nsmq_flashscore/features/contest_detail/domain/entities/contest_detail.dart';
-import 'package:nsmq_flashscore/features/contest_detail/domain/repositories/i_contest_detail_repository.dart';
+import '../models/contest_detail_model.dart';
+import '../../domain/entities/contest_detail.dart';
+import '../../domain/repositories/i_contest_detail_repository.dart';
 
 class ContestDetailRepositoryImpl implements IContestDetailRepository {
+  final ApiClient _apiClient;
+
+  ContestDetailRepositoryImpl({ApiClient? apiClient})
+      : _apiClient = apiClient ?? (Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : ApiClient());
+
   @override
   Future<ContestDetail> getContestDetail(String contestId) async {
-    await Future.delayed(const Duration(milliseconds: 150));
+    try {
+      final response = await _apiClient.safeGet(ApiEndpoints.contestDetail(contestId));
+      if (response.isOk && response.body != null) {
+        final body = response.body;
+        final dynamic dataRaw = body is Map ? body['data'] : body;
+        if (dataRaw is Map<String, dynamic>) {
+          return ContestDetailModel.fromJson(dataRaw);
+        }
+      }
+    } catch (e) {
+      debugPrint('[ContestDetailRepositoryImpl] Backend error, falling back to mock: $e');
+    }
 
+    // Fallback to authentic mock detail
     final allContests = MockContestData.getContests();
     Contest contest;
     try {
@@ -16,7 +38,6 @@ class ContestDetailRepositoryImpl implements IContestDetailRepository {
       contest = allContests.first;
     }
 
-    // Build authentic lineups for each school in the contest
     final lineups = contest.entries.map((entry) {
       final name = entry.school.shortName.isNotEmpty
           ? entry.school.shortName
@@ -72,24 +93,24 @@ class ContestDetailRepositoryImpl implements IContestDetailRepository {
       lineups: lineups,
       problemOfTheDaySummary:
           'Calculate the total electromotive force induced in a 200-turn circular loop of radius 0.05m rotating in a uniform magnetic field of 0.4T at 50 rad/s.',
-      headToHead: [
+      headToHead: const [
         HeadToHeadMatch(
           year: '2023',
           stage: 'Grand Finale',
           winnerSchoolName: 'PRESEC LEGON',
-          scores: const {'PRESEC': 40, 'PREMPEH': 37, 'MFANTSIPIM': 28},
+          scores: {'PRESEC': 40, 'PREMPEH': 37, 'MFANTSIPIM': 28},
         ),
         HeadToHeadMatch(
           year: '2022',
           stage: 'Semi-Finals',
           winnerSchoolName: 'PRESEC LEGON',
-          scores: const {'PRESEC': 51, 'PREMPEH': 49, 'KETA SHTS': 32},
+          scores: {'PRESEC': 51, 'PREMPEH': 49, 'KETA SHTS': 32},
         ),
         HeadToHeadMatch(
           year: '2021',
           stage: 'Quarter-Finals',
           winnerSchoolName: 'PREMPEH',
-          scores: const {'PREMPEH': 46, 'PRESEC': 43, 'OWASS': 35},
+          scores: {'PREMPEH': 46, 'PRESEC': 43, 'OWASS': 35},
         ),
       ],
     );

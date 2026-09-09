@@ -1,10 +1,35 @@
+import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/network/api_client.dart';
+import '../models/tournament_models.dart';
 import '../../domain/entities/tournament_stage.dart';
 import '../../domain/repositories/i_tournament_repository.dart';
 
 class TournamentRepositoryImpl implements ITournamentRepository {
+  final ApiClient _apiClient;
+
+  TournamentRepositoryImpl({ApiClient? apiClient})
+      : _apiClient = apiClient ?? (Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : ApiClient());
+
   @override
   Future<List<TournamentStage>> getStages() async {
-    await Future.delayed(const Duration(milliseconds: 150));
+    try {
+      final response = await _apiClient.safeGet(ApiEndpoints.tournamentStages);
+      if (response.isOk && response.body != null) {
+        final body = response.body;
+        final dynamic dataRaw = body is Map ? body['data'] : body;
+        if (dataRaw is List) {
+          return dataRaw
+              .map((e) => TournamentStageModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('[TournamentRepositoryImpl] getStages backend error, falling back to mock: $e');
+    }
+
+    // Fallback to static stages
     return const [
       TournamentStage(
         id: 'stage_prelims',
@@ -301,7 +326,21 @@ class TournamentRepositoryImpl implements ITournamentRepository {
 
   @override
   Future<List<TournamentAward>> getAwards() async {
-    await Future.delayed(const Duration(milliseconds: 150));
+    try {
+      final response = await _apiClient.safeGet(ApiEndpoints.awards);
+      if (response.isOk && response.body != null) {
+        final body = response.body;
+        final dynamic dataRaw = body is Map ? body['data'] : body;
+        if (dataRaw is List) {
+          return dataRaw
+              .map((e) => TournamentAwardModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('[TournamentRepositoryImpl] getAwards backend error, falling back to mock: $e');
+    }
+
     return const [
       TournamentAward(
         title: 'Pepsodent Highest Scorer Award',

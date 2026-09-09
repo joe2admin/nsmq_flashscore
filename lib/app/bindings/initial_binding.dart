@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../../core/network/api_client.dart';
 import '../../features/contest_detail/data/repositories/contest_detail_repository_impl.dart';
 import '../../features/contest_detail/domain/repositories/i_contest_detail_repository.dart';
 import '../../features/favorites/presentation/controllers/favorites_controller.dart';
@@ -19,6 +20,9 @@ import '../../features/tournament/presentation/controllers/tournament_controller
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
+    // 0. Network & Core Services
+    Get.put<ApiClient>(ApiClient(), permanent: true);
+
     // 1. Repositories (Singletons / Lazy)
     Get.lazyPut<IContestRepository>(() => ContestRepositoryImpl(), fenix: true);
     Get.lazyPut<ITournamentRepository>(() => TournamentRepositoryImpl(), fenix: true);

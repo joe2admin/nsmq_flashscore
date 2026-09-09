@@ -47,7 +47,13 @@ class Contest {
   /// Highest total points among contestants in this contest
   int get highestScore {
     if (entries.isEmpty) return 0;
-    return entries.map((e) => e.scores.total).reduce((a, b) => a > b ? a : b);
+    int max = entries.first.scores.total;
+    for (int i = 1; i < entries.length; i++) {
+      if (entries[i].scores.total > max) {
+        max = entries[i].scores.total;
+      }
+    }
+    return max;
   }
 
   /// Finds the school(s) currently leading with the highest score
@@ -67,8 +73,12 @@ class Contest {
   /// Finds the school currently leading in total points
   ContestantEntry? get leader {
     if (entries.isEmpty) return null;
-    return entries.reduce(
-      (a, b) => a.scores.total >= b.scores.total ? a : b,
-    );
+    ContestantEntry currentLeader = entries.first;
+    for (int i = 1; i < entries.length; i++) {
+      if (entries[i].scores.total > currentLeader.scores.total) {
+        currentLeader = entries[i];
+      }
+    }
+    return currentLeader;
   }
 }

@@ -57,7 +57,7 @@ class ContestModel extends Contest {
 
     final entriesJson = json['entries'] as List<dynamic>? ?? [];
     final entries = entriesJson
-        .map((e) => ContestantEntryModel.fromJson(e as Map<String, dynamic>))
+        .map<ContestantEntry>((e) => ContestantEntryModel.fromJson(e as Map<String, dynamic>))
         .toList();
 
     return ContestModel(

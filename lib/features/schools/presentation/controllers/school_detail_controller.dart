@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:nsmq_flashscore/features/live_scores/domain/entities/contest.dart';
 import 'package:nsmq_flashscore/features/live_scores/domain/entities/school.dart';
 import '../../domain/entities/school_profile.dart';
 import '../../domain/repositories/i_schools_repository.dart';
@@ -9,6 +10,7 @@ class SchoolDetailController extends GetxController {
   SchoolDetailController({required this.repository});
 
   final Rx<SchoolProfile?> profile = Rx<SchoolProfile?>(null);
+  final RxList<Contest> matchHistory = <Contest>[].obs;
   final RxBool isLoading = true.obs;
 
   @override
@@ -18,11 +20,19 @@ class SchoolDetailController extends GetxController {
     if (args is SchoolProfile) {
       profile.value = args;
       isLoading.value = false;
+      loadMatchHistory(args.school.id);
     } else if (args is School) {
       loadSchool(args.id, fallbackSchool: args);
     } else if (args is String) {
       loadSchool(args);
     }
+  }
+
+  Future<void> loadMatchHistory(String id) async {
+    try {
+      final history = await repository.getSchoolHistory(id);
+      matchHistory.assignAll(history);
+    } catch (_) {}
   }
 
   Future<void> loadSchool(String id, {School? fallbackSchool}) async {
@@ -44,6 +54,7 @@ class SchoolDetailController extends GetxController {
           notableContestants: const [],
         );
       }
+      await loadMatchHistory(id);
     } finally {
       isLoading.value = false;
     }
